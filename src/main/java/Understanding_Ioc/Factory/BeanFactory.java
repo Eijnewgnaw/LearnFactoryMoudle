@@ -11,12 +11,12 @@ public class BeanFactory {
     private static Properties properties;
     private static Map<String,Object> beans;
     static {
-        properties=new Properties();
-        InputStream is =BeanFactory.class.getClassLoader().getResourceAsStream("bean.properties");
         try {
+            properties=new Properties();
+            InputStream is =BeanFactory.class.getClassLoader().getResourceAsStream("bean.properties");
             properties.load(is);
             beans = new HashMap<String, Object>();
-            Enumeration keys = properties.keys();
+            Enumeration<Object> keys = properties.keys();
             while (keys.hasMoreElements()){
                 String key = keys.nextElement().toString();
                 String beanPath = properties.getProperty(key);
@@ -35,13 +35,27 @@ public class BeanFactory {
         }
     }
     public  static Object getBean(String beanName){
-        return beans.get(beanName);
+        Object bean =  beans.get(beanName);
+        if (bean == null){
+            String beanPath = properties.getProperty(beanName);
+            try {
+                bean = Class.forName(beanPath).newInstance();
+            } catch (InstantiationException e) {
+                e.printStackTrace();
+            } catch (IllegalAccessException e) {
+                e.printStackTrace();
+            } catch (ClassNotFoundException e) {
+                e.printStackTrace();
+            }
+            return bean;
+        }
+        return bean;
     }
 //    public static Object getBean(String beanName){
-//        Object bean = null;
+//        Object bean.properties = null;
 //        String beanPath = properties.getProperty(beanName);
 //        try {
-//            bean = Class.forName(beanPath).newInstance();
+//            bean.properties = Class.forName(beanPath).newInstance();
 //        } catch (InstantiationException e) {
 //            e.printStackTrace();
 //        } catch (IllegalAccessException e) {
@@ -49,7 +63,7 @@ public class BeanFactory {
 //        } catch (ClassNotFoundException e) {
 //            e.printStackTrace();
 //        }
-//        return bean;
+//        return bean.properties;
 //    }
 
 }
